@@ -4,6 +4,7 @@ import { getVideo, updateVideo } from "../db/videos";
 import type { ApiConfig } from "../config";
 import type { BunRequest } from "bun";
 import { BadRequestError, NotFoundError, UserForbiddenError } from "./errors";
+import path from 'node:path';
 //
 export async function handlerUploadThumbnail(cfg: ApiConfig, req: BunRequest) {
   const { videoId } = req.params as { videoId?: string };
@@ -45,11 +46,14 @@ export async function handlerUploadThumbnail(cfg: ApiConfig, req: BunRequest) {
   if (!fileData) {
     throw new Error("Error reading file data");
   }
+  console.log(`mediaType: ${mediaType}`)
+  const mediaExtension = mediaType.split("/")[1];
+  //cfg.assetsRoot
+  const fileSystemPath = path.join(cfg.assetsRoot, `${videoId}.${mediaExtension}`,);
+  await Bun.write(fileSystemPath, fileData)
+  const fileSystemDataURL = `http://localhost:${cfg.port}/assets/${videoId}.${mediaExtension}`;
   //
-  const base64Encoded = Buffer.from(fileData).toString('base64');
-  const base64DataURL = `data:${mediaType};base64,${base64Encoded}`;
-  //
-  video.thumbnailURL = base64DataURL;
+  video.thumbnailURL = fileSystemDataURL;
   updateVideo(cfg.db, video);
   //
   return respondWithJSON(200, video);
