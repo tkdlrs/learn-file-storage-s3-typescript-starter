@@ -78,13 +78,17 @@ export async function handlerUploadThumbnail(cfg: ApiConfig, req: BunRequest) {
     throw new Error("Error reading file data");
   }
   //
-  videoThumbnails.set(videoId, {
-    data: fileData,
-    mediaType
-  });
+  const arrBuf = Buffer.from(fileData).toString('base64');
+  const dataURL = `data:${mediaType};base64,${arrBuf}`;
   //
-  const urlPath = getInMemoryURL(cfg, videoId);
-  video.thumbnailURL = urlPath;
+  // videoThumbnails.set(videoId, {
+  //   data: fileData,
+  //   mediaType
+  // });
+  //
+  // const urlPath = getInMemoryURL(cfg, videoId);
+  // video.thumbnailURL = urlPath;
+  video.thumbnailURL = dataURL;
   updateVideo(cfg.db, video);
   //
   return respondWithJSON(200, video);
