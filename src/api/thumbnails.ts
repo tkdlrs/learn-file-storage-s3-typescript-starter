@@ -5,6 +5,7 @@ import { getVideo, updateVideo } from "../db/videos";
 import type { ApiConfig } from "../config";
 import type { BunRequest } from "bun";
 import { BadRequestError, NotFoundError, UserForbiddenError } from "./errors";
+import { randomBytes } from "node:crypto";
 
 //
 export async function handlerUploadThumbnail(cfg: ApiConfig, req: BunRequest) {
@@ -46,8 +47,9 @@ export async function handlerUploadThumbnail(cfg: ApiConfig, req: BunRequest) {
     throw new BadRequestError("Invlaid file type. Only JPEG or PNG allowed.");
   }
   //
+  const buf = randomBytes(32).toString("base64url");
   const ext = mediaTypeToExt(mediaType);
-  const filename = `${videoId}${ext}`;
+  const filename = `${buf}${ext}`;
   //
   const assetDiskPath = getAssetDiskPath(cfg, filename);
   await Bun.write(assetDiskPath, file);
