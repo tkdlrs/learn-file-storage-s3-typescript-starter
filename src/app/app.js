@@ -305,8 +305,7 @@ function viewVideo(video) {
     thumbnailImg.style.display = 'none';
   } else {
     thumbnailImg.style.display = 'block';
-    const TIME = new Date();
-    thumbnailImg.src = `${video.thumbnailURL}?v=${TIME.getTime()}`;
+    thumbnailImg.src = `${video.thumbnailURL}?v=${Date.now()}`;
   }
 
   const videoPlayer =
